@@ -2,14 +2,14 @@
 /**
  * Created by PhpStorm.
  * User: Binge
- * Date: 2018-11-12
- * Time: 22:32
+ * Date: 2018-11-13
+ * Time: 22:48
  */
 
 namespace App\Lib\PHPImap;
 
 
-class Message implements MessageInterface
+class ImapException extends \Exception
 {
 
 }

@@ -32,6 +32,6 @@ Route::group(['prefix' => 'email', 'namespace' => 'Email'], function (){
     Route::get('/', 'EmailController@index');
 });
 
-Route::group(['prefix' => 'imap', 'namspace' => 'imap'], function (){
-
+Route::group(['prefix' => 'imap', 'namespace' => 'Imap'], function (){
+    Route::get('/{type?}', 'ImapController@index');
 });

@@ -29,13 +29,13 @@ abstract class AbstractConnection
         return $this->_password;
     }
 
-    public function setUsername($username) : self
+    public function setUsername(string $username) : self
     {
         $this->_username = $username;
         return $this;
     }
 
-    public function setPassword($password) : self
+    public function setPassword(string $password) : self
     {
         $this->_password = $password;
         return $this;
@@ -57,11 +57,12 @@ abstract class AbstractConnection
             $n_retries,
             $params
         );
+
         if(!is_resource($connection)){
             throw new \Exception('Failed to connect ti server');
         }
 
-        return new Client();
+        return new Client($connection, $this->getServerDetails());
     }
 
     public function getServerDetails() : array
@@ -90,7 +91,7 @@ abstract class AbstractConnection
         }
 
         if(!empty($this->path)){
-            $serverRef =  $this->path;
+            $serverRef .=  $this->path;
         }
 
         $serverRef .= '}' . $this->mailbox;
