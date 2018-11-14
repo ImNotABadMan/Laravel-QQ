@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Imap;
 
-use App\Lib\PHPImap\Client;
 use App\Lib\PHPImap\Gmail\GmailConnection;
 use App\Lib\PHPImap\QQ\QQConnection;
 use Illuminate\Http\Request;

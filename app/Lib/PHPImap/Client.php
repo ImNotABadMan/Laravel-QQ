@@ -29,7 +29,7 @@ class Client
         }
 
         $this->_connection = $connection;
-        $this->_prototype = new Message();
+        $this->_prototype = new Message($connection);
         $this->_spec = $spec;
         $this->_currentMailbox = $spec['mailbox'];
     }
@@ -136,9 +136,73 @@ class Client
 
         $list = array_reverse($list);
 
-        $collection = new Collection($list);
+        $collection = new Collection();
+
+        foreach ($list as $key => $item) {
+            $message = $this->getPrototype();
+
+            $message->setFrom($item->from)
+                ->setTo($item->to)
+                ->setDate($item->date)
+                ->setSubject($item->subject)
+                ->setMessageNo($item->msgno)
+                ->setSize($item->size)
+                ->setUID($item->uid);
+
+            if(!empty($item->message_id)){
+                $message->setMessageID($item->message_id);
+            }
+
+            if(!empty($item->references)){
+                $message->setReferences($item->references);
+            }
+
+            if(!empty($item->in_reply_to)){
+                $message->setInReplyTo($item->in_reply_to);
+            }
+
+            $collection->put($key, $message);
+
+        }
 
         return $collection;
+    }
+
+    /**
+     * 获得单个Message
+     * @return MessageInterface
+    */
+    public function getMessage($id, int $option = 0) : MessageInterface
+    {
+        $overview = imap_fetch_overview($this->_connection, $id, $option);
+
+        if(!empty($overview)){
+            $overview = array_pop($overview);
+        }
+
+        $message = $this->getPrototype();
+
+        $message->setFrom($overview->from)
+            ->setTo($overview->to)
+            ->setDate($overview->date)
+            ->setSubject($overview->subject)
+            ->setMessageNo($overview->msgno)
+            ->setSize($overview->size)
+            ->setUID($overview->uid);
+
+        if(!empty($item->message_id)){
+            $message->setMessageID($item->message_id);
+        }
+
+        if(!empty($overview->references)){
+            $message->setReferences($overview->references);
+        }
+
+        if(!empty($overview->in_reply_to)){
+            $message->setInReplyTo($overview->in_reply_to);
+        }
+
+        return $message;
     }
 
 }
