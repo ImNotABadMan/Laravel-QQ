@@ -21,6 +21,8 @@ interface AttachmentInterface
 
     public function setFilename(string $filename) : AttachmentInterface ;
 
+    public function getFilename() : string ;
+
     public function setPartID(string $partID) : AttachmentInterface ;
 
     public function getPartID() : string ;
@@ -28,4 +30,8 @@ interface AttachmentInterface
     public function setMineType(string $mineType) : AttachmentInterface ;
 
     public function getMineType() : string ;
+
+    public function setData(string $data) : AttachmentInterface;
+
+    public function getData() : string ;
 }

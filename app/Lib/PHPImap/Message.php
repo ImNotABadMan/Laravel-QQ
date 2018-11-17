@@ -55,6 +55,22 @@ class Message implements MessageInterface
         $this->_connection = $connection;
     }
 
+    public function getConnection()
+    {
+        // TODO: Implement getConnection() method.
+        return $this->_connection;
+    }
+
+    public function setConnection($connection): MessageInterface
+    {
+        // TODO: Implement setConnection() method.
+        if(!is_resource($connection)){
+            throw new \InvalidArgumentException('Connection is Not a resource');
+        }
+        $this->_connection = $connection;
+        return $this;
+    }
+
     /**
      * @return MessageInterface
     */
