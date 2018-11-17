@@ -125,6 +125,7 @@ class Client
                             $option = 0) : Collection
     {
         $boxInfo = imap_check($this->_connection);
+
         $start = $boxInfo->Nmsgs - ($perPage * $page);
         $end = $start + ($perPage - (($page > 1) ? 1 : 0));
 
@@ -190,19 +191,14 @@ class Client
             ->setSize($overview->size)
             ->setUID($overview->uid);
 
-        if(!empty($item->message_id)){
-            $message->setMessageID($item->message_id);
-        }
-
-        if(!empty($overview->references)){
-            $message->setReferences($overview->references);
-        }
-
-        if(!empty($overview->in_reply_to)){
-            $message->setInReplyTo($overview->in_reply_to);
-        }
-
         return $message;
+    }
+
+
+    public function getCount()
+    {
+        $boxInfo = imap_check($this->_connection);
+        return isset($boxInfo->Nmsgs) ? intval($boxInfo->Nmsgs) : 0;
     }
 
 }

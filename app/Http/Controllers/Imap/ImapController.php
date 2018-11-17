@@ -6,6 +6,7 @@ use App\Lib\PHPImap\Gmail\GmailConnection;
 use App\Lib\PHPImap\QQ\QQConnection;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class ImapController extends Controller
 {
@@ -37,12 +38,31 @@ class ImapController extends Controller
         }
     }
 
-    public function index()
+    public function index($type = 'qq', string $box = 'inbox', Request $request)
     {
-        $list = $this->_client->getPage();
-        foreach ($list as $email){
-            $email = $email->fetch();
-            dd($email);
+        $mailboxes = $this->_client->getMailboxes();
+
+        if($box != $this->_client->getCurrentMailbox()){
+            if(in_array($box, $mailboxes)){
+                $currentMailbox = $box;
+            }else{
+                $currentMailbox = 'inbox';
+            }
+            try{
+                $this->_client->setCurrentMailbox($box);
+            }catch (\Exception $exception){}
         }
+        $page = $request->get('page', 1);
+
+        $list = $this->_client->getPage($page);
+
+        $paginator = new LengthAwarePaginator($list,
+            $this->_client->getCount(), 25, $page, [
+                'path' => '/imap/' . $type . '/' . $box
+            ]);
+
+        return view('imap.index')->with('list', $paginator)
+            ->with('mailboxes', $mailboxes)
+            ->with('currentMailbox', $currentMailbox);
     }
 }

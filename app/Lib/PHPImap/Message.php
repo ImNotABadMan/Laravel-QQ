@@ -9,6 +9,8 @@
 namespace App\Lib\PHPImap;
 
 
+use Carbon\Carbon;
+
 class Message implements MessageInterface
 {
     private $_connection;
@@ -55,6 +57,22 @@ class Message implements MessageInterface
         $this->_connection = $connection;
     }
 
+    private function _changeEncoding($str)
+    {
+        if($str) {
+            // 判断编码
+            $encode = mb_detect_encoding($str, array("ASCII", "UTF-8", "GB2312", "GBK", "BIG5"));
+            switch ($encode) {
+                case 'EUC-CN':
+                case 'GB2312':
+                case 'GBK':
+                    $str = iconv('GBK', 'UTF-8', $str);
+                    break;
+            }
+        }
+        return $str;
+    }
+
     public function getConnection()
     {
         // TODO: Implement getConnection() method.
@@ -77,7 +95,9 @@ class Message implements MessageInterface
     public function setDate(string $date): MessageInterface
     {
         // TODO: Implement setDate() method.
-        $this->_date = $date;
+        $this->_date = ($date instanceof \DateTime) ?
+            $date :
+            new Carbon(date('Y-m-d H:i:s', strtotime($date)));
         return $this;
     }
 
@@ -112,7 +132,9 @@ class Message implements MessageInterface
     public function setSubject(string $subject) : MessageInterface
     {
         // TODO: Implement setSubject() method.
-        $this->_subject = $subject;
+        // 需要解码
+        $this->_subject = base64_decode(str_replace(['=?GBK?B?', '=?UTF8?B?', '?='],'', $subject));
+        $this->_subject = $this->_changeEncoding($this->_subject);
         return $this;
     }
 
@@ -122,10 +144,20 @@ class Message implements MessageInterface
         return $this->_from;
     }
 
-    public function setFrom(string $form) : MessageInterface
+    public function setFrom(string $from) : MessageInterface
     {
         // TODO: Implement setFrom() method.
-        $this->_from = $form;
+        $prefix = strstr($from, '<', true);
+        $fromMail = str_replace($prefix, '', $from);
+        $prefix = str_replace(['=?GBK?B?', '=?UTF8?B?', '?='],'', $prefix);
+        $position = strpos($prefix, '=');
+        if($position){
+            $prefix = substr($prefix, 0,  $position);
+        }
+        $prefix .= '==';
+        $base64 = base64_decode($prefix);
+        $prefix = $this->_changeEncoding($base64);
+        $this->_from = $prefix . $fromMail;
         return $this;
     }
 
