@@ -33,6 +33,14 @@ class Message implements MessageInterface
 
     private $_inReplyTo;
 
+    // 附件
+    private $_attachment;
+
+    // 邮件内容--文本
+    private $_plainBody;
+
+    // 邮件内容--html
+    private $_htmlBody;
     /**
      * @throws
     */
@@ -157,7 +165,6 @@ class Message implements MessageInterface
         return $this;
     }
 
-
     public function getTo(): string
     {
         // TODO: Implement getTo() method.
@@ -171,13 +178,11 @@ class Message implements MessageInterface
         return $this;
     }
 
-
     public function getUID(): string
     {
         // TODO: Implement getUID() method.
         return $this->_uID;
     }
-
 
     public function setUID(string $uid) : MessageInterface
     {
@@ -192,6 +197,7 @@ class Message implements MessageInterface
     public function fetch(int $option = 0) : self
     {
         $structure = imap_fetchstructure($this->_connection, $this->getMessageNo(), $option);
+//        dd($structure);
 
         if(empty($structure)){
             return $this;
@@ -216,9 +222,123 @@ class Message implements MessageInterface
         return $this;
     }
 
-    public function processStruct($structure)
+    /**
+     * 解析邮件内容
+    */
+    protected function processStruct($structure, $partID = null)
     {
+        $params = [];
+        $self = $this;
+        // 匿名函数，解析成树结构
+        $resource = function ($struct) use ($self, $partID){
+            if(isset($struct->parts) && is_array($struct->parts)){
+                foreach ($struct->parts as $ids => $part){
+                    $currentID = $ids + 1;
+                    if( !is_null($partID) ){
+                        $currentID = $partID . '.' . $currentID;
+                    }
 
+                    $self->processStruct($part, $currentID);
+                }
+            }
+            return $self;
+        };
+
+        if( isset($structure->parameters) ){
+            foreach ($structure->parameters as $parameter){
+                $params[strtolower($parameter->attribute)] = $parameter->value;
+            }
+        }
+        if(isset($structure->dparameters)){
+            foreach ($structure->dparameters as $dparameter){
+                $params[strtolower($dparameter->attribute)] = $dparameter->value;
+            }
+        }
+
+        // 判断是什么类型，再根据类型解析
+        if(isset($params['name']) || isset($params['filename']) ||
+            (isset($structure->subtype) && strtolower($structure->subtype) == 'rfc822')
+        ){
+            // Process attachment
+            $filename = isset($params['name']) ? $params['name'] : $params['filename'];
+            $attachment = new Attachment($this);
+            $attachment->setSize($structure->bytes)
+                ->setEncoding($structure->encoding)
+                ->setFilename($filename)
+                ->setPartID($partID);
+
+            switch ($structure->type){
+                case TYPETEXT:
+                    $mineType = 'text';
+                    break;
+                case TYPEMESSAGE:
+                    $mineType = 'message';
+                    break;
+                case TYPEAPPLICATION:
+                    $mineType = 'application';
+                    break;
+                case TYPEAUDIO:
+                    $mineType = 'audio';
+                    break;
+                case TYPEVIDEO:
+                    $mineType = 'video';
+                    break;
+                case TYPEIMAGE:
+                    $mineType = 'image';
+                    break;
+                case TYPEOTHER:
+                default:
+                    $mineType = 'other';
+                    break;
+            }
+
+            $mineType .= '/' . $structure->subtype;
+            $attachment->setMineType($mineType);
+            $this->_attachment[$partID] = $attachment;
+
+            //递归根节点为attachment类型的$resource，看看有没有子节点
+            return $resource($structure);
+        }
+
+        if(!is_null($partID)){
+            $body = imap_fetchbody($this->_connection, $this->getMessageNo(), $partID, FT_PEEK);
+        }else{
+            $body = imap_body($this->_connection, $this->getUID(), FT_UID | FT_PEEK);
+        }
+
+        $encoding = strtolower($structure->encoding);
+
+        switch ($encoding){
+            case 'quoted-printable':
+            case ENCQUOTEDPRINTABLE:
+                $body = quoted_printable_decode($body);
+                break;
+            case 'base64':
+            case ENCBASE64:
+                $body = base64_decode($body);
+                break;
+        }
+
+        $subtype = strtolower($structure->subtype);
+
+        switch (true){
+            case $subtype == 'plain':
+                if(!empty($this->_plainBody)){
+                    $this->_plainBody .= PHP_EOL . PHP_EOL . trim($body);
+                }else{
+                    $this->_plainBody = $body;
+                }
+                break;
+            case $subtype == 'html':
+                if (!empty($this->_htmlBody)){
+                    $this->_htmlBody .= nl2br("\n\n") . $body;
+                }else{
+                    $this->_htmlBody = $body;
+                }
+                break;
+        }
+
+        return $resource($structure);
     }
 
 }

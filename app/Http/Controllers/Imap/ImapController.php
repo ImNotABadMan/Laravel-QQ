@@ -40,6 +40,9 @@ class ImapController extends Controller
     public function index()
     {
         $list = $this->_client->getPage();
-        dump($list);
+        foreach ($list as $email){
+            $email = $email->fetch();
+            dd($email);
+        }
     }
 }
