@@ -44,7 +44,7 @@ class QQ
 
     public function __construct()
     {
-        $this->_params['oauth_consumer_key'] = $this->_appID = env('QQ_APP_ID');
+        $this->_params['oauth_consumer_key'] = $this->_appID = config('qq.app_id');
     }
 
     /**

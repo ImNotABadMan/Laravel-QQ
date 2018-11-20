@@ -161,6 +161,7 @@ return [
         App\Providers\RouteServiceProvider::class,
         // imap service provider
         \Packages\Imap\Provider\ImapServiceProvider::class,
+        \Packages\QQ\QQServiceProvider::class,
 
     ],
 

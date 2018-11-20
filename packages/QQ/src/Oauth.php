@@ -16,7 +16,7 @@ class Oauth
     // 1、oauth认证，获得QQ颁发的code值，表示入门券
     private $_oauthUrl = 'https://graph.qq.com/oauth2.0/authorize';
 
-    private $_redirectUrl = '/user/callback/qq';
+    private $_redirectUrl = '';
 
     // 应用appID
     private $_clientID = '';
@@ -63,19 +63,20 @@ class Oauth
 
     public function __construct()
     {
-        $this->_oauthParams['redirect_uri'] = env('APP_URL') . $this->_redirectUrl;
-        $this->_oauthParams['client_id'] = $this->_clientID = env('QQ_CLIENT_ID');
+        $this->_redirectUrl = config('qq.redirect_url');
+        $this->_oauthParams['redirect_uri'] = $this->_redirectUrl;
+        $this->_oauthParams['client_id'] = $this->_clientID = config('qq.client_id');
         $this->_oauthParams['scope'] = $this->_scopes['get_user_info'];
 
         // step 2 get access token
-        $this->_tokenParams['client_id'] = $this->_appID = env('QQ_APP_ID');
-        $this->_tokenParams['client_secret'] = $this->_appSecret = env('QQ_APP_SECRET');
-        $this->_tokenParams['redirect_uri'] = env('APP_URL') . $this->_redirectUrl;
+        $this->_tokenParams['client_id'] = $this->_appID = config('qq.app_id');
+        $this->_tokenParams['client_secret'] = $this->_appSecret = config('qq.app_secret');
+        $this->_tokenParams['redirect_uri'] = config('qq.redirect_url');
 
         // access_token 有效期为3个月
         // 自动续期access_token
-        $this->_refreshParams['client_id'] = $this->_appID = env('QQ_APP_ID');
-        $this->_refreshParams['client_secret'] = $this->_appSecret = env('QQ_APP_SECRET');
+        $this->_refreshParams['client_id'] = $this->_appID = config('qq.app_id');
+        $this->_refreshParams['client_secret'] = $this->_appSecret = config('qq.app_secret');
     }
 
     /**
