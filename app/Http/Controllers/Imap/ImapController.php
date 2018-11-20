@@ -18,18 +18,18 @@ class ImapController extends Controller
         try{
             switch ($request->route('type')) {
                 case 'gmail':
-                    $this->_client = $gmailConnection->setUsername(env('GMAIL_IMAP_USERNAME'))
-                        ->setPassword(env('GMAIL_IMAP_PASSWORD'))
+                    $this->_client = $gmailConnection->setUsername(config('imap.gmail')['user'])
+                        ->setPassword(config('imap.gmail')['password'])
                         ->connect();
                     break;
                 case 'qq':
-                    $this->_client = $QQConnection->setUsername(env('QQ_IMAP_USERNAME'))
-                        ->setPassword(env('QQ_IMAP_PASSWORD'))
+                    $this->_client = $QQConnection->setUsername(config('imap.qq')['user'])
+                        ->setPassword(config('imap.qq')['password'])
                         ->connect();
                     break;
                 default:
-                    $this->_client = $QQConnection->setUsername(env('QQ_IMAP_USERNAME'))
-                        ->setPassword(env('QQ_IMAP_PASSWORD'))
+                    $this->_client = $QQConnection->setUsername(config('imap.qq')['user'])
+                        ->setPassword(config('imap.qq')['password'])
                         ->connect();
                     break;
             }
@@ -55,6 +55,7 @@ class ImapController extends Controller
         $page = $request->get('page', 1);
 
         $list = $this->_client->getPage($page);
+        dump($list);
 
         $paginator = new LengthAwarePaginator($list,
             $this->_client->getCount(), 25, $page, [

@@ -61,14 +61,25 @@ class Message implements MessageInterface
     {
         if($str) {
             // 判断编码
-            $encode = mb_detect_encoding($str, array("ASCII", "UTF-8", "GB2312", "GBK", "BIG5"));
+            $encode = mb_detect_encoding($str, array("ASCII", "UTF-8", "GB2312", "GBK", "BIG5", "CP936", "ISO-8859-1"), "UTF7-IMAP");
+//            dump($encode);
+            dump($str);
             switch ($encode) {
                 case 'EUC-CN':
                 case 'GB2312':
                 case 'GBK':
                     $str = iconv('GBK', 'UTF-8', $str);
                     break;
+                case "CP936":
+                case "ISO-8859-1":
+                    if(request('type') == 'gmail'){
+                        $str = trim(trim(rtrim(ltrim($str, 'b'), 'E'),"\""));
+                    }
+                    dump($str);
+                    $str = iconv('ISO-8859-1', 'UTF-8', $str);
+                    break;
             }
+//            dump($str);
         }
         return $str;
     }
