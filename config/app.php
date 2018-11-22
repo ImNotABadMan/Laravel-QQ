@@ -150,6 +150,7 @@ return [
         /*
          * Package Service Providers...
          */
+        \Packages\MyServiceContainerTest\MyServiceProvider::class,
 
         /*
          * Application Service Providers...

@@ -55,7 +55,7 @@ class ImapController extends Controller
         $page = $request->get('page', 1);
 
         $list = $this->_client->getPage($page);
-        dump($list);
+//        dump($list);
 
         $paginator = new LengthAwarePaginator($list,
             $this->_client->getCount(), 25, $page, [
