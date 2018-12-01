@@ -13,7 +13,7 @@ tionApp/webflow/sparta/hostedSoleSolutionProcess" method="post">
     <input type="hidden" name="business" value="{{ $merchantID }}">
     <input type="hidden" name="paymentaction" value="sale">
     <input type="hidden" name="return"
-           value="http://localhost/paypalCreditCard/ipn">
+           value="http://learn.from.book/paypalCreditCard">
     <input type="submit" name="METHOD" value="Pay Now">
 </form>
 </body>
@@ -95,4 +95,41 @@ tionApp/webflow/sparta/hostedSoleSolutionProcess" method="post">
     'notify_version' => '3.9',
     'ipn_track_id' => 'c1edbed88ec20',
 )
+
+[2018-12-01 09:55:40] local.INFO: array (
+  'mc_gross' => '50.00',
+  'protection_eligibility' => 'Ineligible',
+  'payer_id' => 'BQZ38KN7U77ZW',
+  'tax' => '0.00',
+  'payment_date' => '01:55:27 Dec 01, 2018 PST',
+  'payment_status' => 'Completed',
+  'charset' => 'windows-1252',
+  'first_name' => NULL,
+  'mc_fee' => '2.00',
+  'notify_version' => '3.9',
+  'custom' => NULL,
+  'payer_status' => 'unverified',
+  'business' => 'test_nighslee@uk.com',
+  'quantity' => '1',
+  'verify_sign' => 'AKwUpvimaCAfmfJ-.PhckWeGqTcrAksBd3r5CV1CeLoWXc8u7yPehIG5',
+  'txn_id' => '2NS08254L22458132',
+  'payment_type' => 'instant',
+  'last_name' => NULL,
+  'receiver_email' => 'test_nighslee@uk.com',
+  'payment_fee' => '2.00',
+  'receiver_id' => 'L96AM84UCNEQU',
+  'txn_type' => 'web_accept',
+  'item_name' => NULL,
+  'mc_currency' => 'USD',
+  'item_number' => NULL,
+  'residence_country' => 'GB',
+  'test_ipn' => '1',
+  'receipt_id' => '4752-3062-5596-9050',
+  'handling_amount' => '0.00',
+  'transaction_subject' => NULL,
+  'payment_gross' => '50.00',
+  'shipping' => '0.00',
+  'ipn_track_id' => 'a23e6154d4bf5',
+)
+
 </pre>

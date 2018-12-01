@@ -43,5 +43,6 @@ Route::group(['prefix' => 'container', 'namespace' => 'ServiceContainer'], funct
 
 Route::group(['prefix' => 'paypalCreditCard', 'namespace' => 'Payment'], function (){
     Route::any('/ipn', 'PayPalCreditCardController@ipn');
+    Route::any('/transaction', 'PayPalCreditCardController@getTransaction');
     Route::get('/', 'PayPalCreditCardController@index');
 });
