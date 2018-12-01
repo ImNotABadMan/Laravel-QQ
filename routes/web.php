@@ -40,3 +40,8 @@ Route::group(['prefix' => 'imap', 'namespace' => 'Imap'], function (){
 Route::group(['prefix' => 'container', 'namespace' => 'ServiceContainer'], function (){
     Route::get('/', 'ServiceContainerController@container');
 });
+
+Route::group(['prefix' => 'paypalCreditCard', 'namespace' => 'Payment'], function (){
+    Route::any('/ipn', 'PayPalCreditCardController@ipn');
+    Route::get('/', 'PayPalCreditCardController@index');
+});
