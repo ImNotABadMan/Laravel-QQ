@@ -35,6 +35,9 @@ class HomeController extends Controller
         }else{
             $user = [];
         }
+
+//        dump("realpath_cache_size: " . realpath_cache_size());
+//        dump("memory_get_peak_usage: " . memory_get_peak_usage());
         return view('home', compact('user'));
     }
 }
